@@ -13,7 +13,7 @@
 
 ## 特性
 
-- **完整的鲸鱼娘皮肤，独立运行**：原版 `skin.css`（L1 token 重映射，96 个 `--dsw-alias-*`）与 `patches.css`（L3 全息氛围层），按皮肤中心运行时相同的方式注入
+- **完整的鲸鱼娘皮肤，独立运行**：原版 `skin.css`（L1 token 重映射，95 个 `--dsw-alias-*`）与 `patches.css`（L3 全息氛围层），按皮肤中心运行时相同的方式注入
 - **循环鲸鱼背景视频**：固定背景层（`z-index: -2`，`pointer-events: none`）承载 2.58 秒眨眼循环与 scrim 渐变，body 背景强制透明让画面透出
 - **皮肤中心契约盖章**：插件激活期间设置 `html[data-dsh-skin="whale-fantasy"]`，针对该标记编写的补丁（以及依赖该标记的其他插件）行为完全一致
 - **完全自包含，运行时零网络**：样式表与视频在构建期全部内联进 client bundle（视频为 base64，运行时转 blob URL）——无 CDN、无静态资源路由、无全局变量
@@ -91,7 +91,7 @@ pnpm build        # 打出 lib/index.js + lib/client.js（资产已随仓库分�
 .
 ├── cordis.patch.yml      # bundle 补丁：把插件行插入 web 插件名册
 ├── package.json          # exports、dsh.bundle / dsh.client 清单
-├── lib                   # 构建产物（已 gitignore）
+├── lib                   # 构建产物（已提交，git 安装无需构建步骤）
 ├── assets
 │   └── whale-blink-loop.mp4   # 裁剪后的背景视频；skin-assets.ts 中 base64 的来源
 └── src

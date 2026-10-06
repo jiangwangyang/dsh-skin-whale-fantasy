@@ -13,7 +13,7 @@ The **Whale Girl · The Unreached (鲸鱼娘 · 未至之境)** skin as a standa
 
 ## Features
 
-- **The full whale-fantasy skin, standalone**: the original `skin.css` (L1 token remap, 96 `--dsw-alias-*` tokens) and `patches.css` (L3 holographic atmosphere layer), injected exactly as the skin center's runtime would
+- **The full whale-fantasy skin, standalone**: the original `skin.css` (L1 token remap, 95 `--dsw-alias-*` tokens) and `patches.css` (L3 holographic atmosphere layer), injected exactly as the skin center's runtime would
 - **Looping whale background video**: a fixed background layer (`z-index: -2`, `pointer-events: none`) carries the 2.58 s blink loop plus a scrim gradient, with the body background forced transparent so the art shows through
 - **Skin-center contract stamp**: `html[data-dsh-skin="whale-fantasy"]` is set while the plugin is active, so patches written against the stamp (and other plugins keying on it) behave identically
 - **Fully self-contained, zero runtime network**: the stylesheets and the video are inlined into the client bundle at build time (the video as base64, delivered to the element as a blob URL) — no CDN, no static asset routes, no globals
@@ -91,7 +91,7 @@ pnpm build        # bundles lib/index.js + lib/client.js (assets ship with the r
 .
 ├── cordis.patch.yml      # bundle patch: inserts the plugin row into the web roster
 ├── package.json          # exports, dsh.bundle / dsh.client manifest
-├── lib                   # build output (gitignored)
+├── lib                   # build output (committed, so git installs need no build step)
 ├── assets
 │   └── whale-blink-loop.mp4   # trimmed background video; base64 source of skin-assets.ts
 └── src
