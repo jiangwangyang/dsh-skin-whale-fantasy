@@ -11,14 +11,14 @@
  *      kept so patches written against it (and other plugins keying on it)
  *      behave identically;
  *   4. a fixed background layer (z-index:-2, pointer-events:none) carrying
- *      the looping video plus its scrim, with body backgrounds forced
+ *      the looping blink video plus its scrim, with body backgrounds forced
  *      transparent so the art shows through.
  *
  * Everything lives inside one ctx.effect, so unloading the plugin tears the
  * skin down completely (disposers run in reverse registration order).
  */
 import type { Context } from '@deepseek-ai/cordis'
-import { PATCHES_CSS, SCRIM, SKIN_CSS, VIDEO_URLS } from './generated/skin-assets.ts'
+import { PATCHES_CSS, SCRIM, SKIN_CSS, VIDEO_BASE64 } from './generated/skin-assets.ts'
 
 const SKIN_ID = 'whale-fantasy'
 const LAYER_ATTR = 'data-dsh-skin-layer'
@@ -32,9 +32,8 @@ export function apply(ctx: Context): void {
       disposers.push(fn)
     }
 
-    // 1-2. Stylesheets. Inlined at build time (the video is the only remote
-    // asset), so relative url() resolution is not a concern — the skin ships
-    // none besides the background video declared in the manifest.
+    // 1-2. Stylesheets. Every asset (CSS and the video) is inlined at build
+    // time, so relative url() resolution and network access are not concerns.
     const skinStyle = doc.createElement('style')
     skinStyle.setAttribute(STYLE_ATTR, 'dsh-skin-whale-fantasy/skin')
     skinStyle.textContent = SKIN_CSS
@@ -66,12 +65,12 @@ export function apply(ctx: Context): void {
     video.playsInline = true
     video.setAttribute('disablepictureinpicture', '')
     video.style.cssText = 'width:100%;height:100%;object-fit:cover;'
-    for (const url of VIDEO_URLS) {
-      const source = doc.createElement('source')
-      source.src = url
-      source.type = 'video/mp4'
-      video.appendChild(source)
-    }
+    // The blink loop is inlined as base64 at build time; hand it to the
+    // element as a blob URL so no network fetch ever happens.
+    const videoBytes = Uint8Array.from(atob(VIDEO_BASE64), (c) => c.charCodeAt(0))
+    const videoUrl = URL.createObjectURL(new Blob([videoBytes], { type: 'video/mp4' }))
+    video.src = videoUrl
+    onDispose(() => URL.revokeObjectURL(videoUrl))
     layer.appendChild(video)
 
     const scrim = doc.createElement('div')

@@ -41,8 +41,10 @@ applies immediately; disable it to restore the stock look.
   palette under both light and dark system schemes.
 - **Mutually exclusive with the skin center** (`@linxin666/dsh-client-ui-skin-center`):
   both stamp `data-dsh-skin` and own the background layer. Use one or the other.
-- The background video (~6.6 MB) streams from a CDN (jsDelivr, with the raw
-  GitHub URL as fallback). Everything else is bundled into `lib/client.js`.
+- The background video is `assets/whale-blink-loop.mp4`: the upstream 25.5 s
+  loop trimmed to the 2.58 s blink segment (the line-construction intro is
+  dropped, the remaining blink cycles seamlessly). It is base64-inlined into
+  `lib/client.js` at build time — the plugin makes no network requests.
 
 ## Credits and license
 
