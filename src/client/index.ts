@@ -4,7 +4,7 @@
  * 应用方式与皮肤中心完全一致，只是剥掉了一切管理职能——启用插件皮肤
  * 即生效，禁用即恢复默认外观。一次激活、无切换、无设置：
  *
- *   1. skin.css（L1 token 重映射，96 个 --dsw-alias-*）以 <style> 标签注入；
+ *   1. skin.css（L1 token 重映射，95 个 --dsw-alias-*）以 <style> 标签注入；
  *   2. patches.css（L3 氛围层）以 <style> 标签注入；
  *   3. html[data-dsh-skin="whale-fantasy"]——皮肤中心契约盖章，保留它
  *      可让针对该标记编写的补丁（以及依赖该标记的其他插件）行为完全一致；
