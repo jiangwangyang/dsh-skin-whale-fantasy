@@ -9,6 +9,8 @@
 
 把 **鲸鱼娘 · 未至之境（Whale Girl · The Unreached）** 皮肤做成独立 DeepSeek Harness（dsh）插件：启用即应用，禁用即无残留还原。没有皮肤中心、没有设置项、没有皮肤列表——只有主题本身。
 
+![hero](docs/screenshots/whale-fantasy.jpg)
+
 ## 特性
 
 - **完整的鲸鱼娘皮肤，独立运行**：原版 `skin.css`（L1 token 重映射，96 个 `--dsw-alias-*`）与 `patches.css`（L3 全息氛围层），按皮肤中心运行时相同的方式注入

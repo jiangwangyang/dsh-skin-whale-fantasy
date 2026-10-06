@@ -9,6 +9,8 @@ English | [中文](README.zh-CN.md)
 
 The **Whale Girl · The Unreached (鲸鱼娘 · 未至之境)** skin as a standalone DeepSeek Harness (dsh) plugin: enable the plugin and the skin is on, disable it and the stock look returns without residue. No skin center, no settings, no skin list — just the theme.
 
+![hero](docs/screenshots/whale-fantasy.jpg)
+
 ## Features
 
 - **The full whale-fantasy skin, standalone**: the original `skin.css` (L1 token remap, 96 `--dsw-alias-*` tokens) and `patches.css` (L3 holographic atmosphere layer), injected exactly as the skin center's runtime would
