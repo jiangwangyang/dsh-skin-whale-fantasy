@@ -24,6 +24,7 @@
     }
   },
   "scripts": {
+    "prepare": "tsdown",
     "build": "tsdown",
     "watch": "tsdown --watch",
     "typecheck": "tsc -p tsconfig.json --noEmit"
