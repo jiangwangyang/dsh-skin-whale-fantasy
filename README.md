@@ -47,9 +47,7 @@ The skin is purely browser-side: the host side is an empty implementation (the b
 |------------------|----------|----------------|
 | Host side        | `src/index.ts` | Empty implementation (`apply()` does nothing) |
 | Client side      | `src/client/index.ts` | Injects stylesheets, stamps `data-dsh-skin`, mounts the background layer, all inside one `ctx.effect` |
-| Skin assets      | `src/client/generated/skin-assets.ts` (generated) | `SKIN_CSS` / `PATCHES_CSS` / `VIDEO_BASE64` / `SCRIM`, baked in at build time |
-| Asset fetcher    | `scripts/fetch-skin.mjs` | Downloads `skin.css` / `patches.css` / `LICENSE` from the upstream market tree and regenerates the assets module |
-| Background video | `assets/whale-blink-loop.mp4` | The upstream 25.5 s loop trimmed to the seamless 2.58 s blink segment |
+| Skin assets      | `src/client/skin-assets.ts` | `SKIN_CSS` / `PATCHES_CSS` / `VIDEO_BASE64` / `SCRIM`, all inlined and shipped with the repo; the video is the upstream 25.5 s loop trimmed to the seamless 2.58 s blink segment |
 
 ### Activation Steps
 
@@ -64,11 +62,11 @@ One activation, no switching, no settings — the client replicates exactly what
 
 - All skin visuals key off the `data-dsh-skin` attribute on the `html` element and the injected `<style>` tags: present while the plugin is active, gone the moment it is disabled — no residue
 - Everything is registered inside a single `ctx.effect`; disposers run in reverse registration order on unload: stylesheets removed, stamp removed, video paused and its blob URL revoked, background layer removed, body background restored
-- Every asset (CSS and the video) is inlined at build time, so relative `url()` resolution and network access are not concerns; the trade-off is a larger client bundle
+- Every asset (CSS and the video) is bundled into the client, so relative `url()` resolution and network access are not concerns; the trade-off is a larger client bundle
 
 ### The Background Video
 
-`assets/whale-blink-loop.mp4` is the upstream 25.5 s loop trimmed to the 2.58 s blink segment (frames 378-439, 15.71 s–18.29 s; the line-construction intro is dropped, and the remaining blink cycles seamlessly). Reproduce with:
+The source video lives at `assets/whale-blink-loop.mp4` (base64-inlined into `src/client/skin-assets.ts`): it is the upstream 25.5 s loop trimmed to the 2.58 s blink segment (frames 378-439, 15.71 s–18.29 s; the line-construction intro is dropped, and the remaining blink cycles seamlessly). Reproduce with:
 
 ```bash
 ffmpeg -ss 15.7083 -i whale-fantasy-loop.mp4 -frames:v 62 \
@@ -82,8 +80,7 @@ At runtime the video is decoded from its inlined base64 into a blob URL and hand
 
 ```bash
 pnpm install
-pnpm build        # downloads the skin assets, then bundles lib/index.js + lib/client.js
-pnpm fetch-skin   # re-download skin.css / patches.css and regenerate the assets module + LICENSE
+pnpm build        # bundles lib/index.js + lib/client.js (assets ship with the repo - no download step)
 ```
 
 ## Project Structure
@@ -92,16 +89,14 @@ pnpm fetch-skin   # re-download skin.css / patches.css and regenerate the assets
 .
 ├── cordis.patch.yml      # bundle patch: inserts the plugin row into the web roster
 ├── package.json          # exports, dsh.bundle / dsh.client manifest
+├── lib                   # build output (gitignored)
 ├── assets
-│   └── whale-blink-loop.mp4   # trimmed background video (inlined at build time)
-├── scripts
-│   └── fetch-skin.mjs    # build-time skin asset fetcher
+│   └── whale-blink-loop.mp4   # trimmed background video; base64 source of skin-assets.ts
 └── src
     ├── index.ts          # host side (empty implementation)
     └── client
         ├── index.ts      # client side (styles + stamp + background layer)
-        └── generated
-            └── skin-assets.ts   # generated; do not edit — re-run `pnpm fetch-skin`
+        └── skin-assets.ts   # skin assets (CSS + video, all inlined)
 ```
 
 ## Credits

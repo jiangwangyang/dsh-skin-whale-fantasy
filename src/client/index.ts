@@ -15,7 +15,7 @@
  * 逆序执行）。
  */
 import type { Context } from '@deepseek-ai/cordis'
-import { PATCHES_CSS, SCRIM, SKIN_CSS, VIDEO_BASE64 } from './generated/skin-assets.ts'
+import { PATCHES_CSS, SCRIM, SKIN_CSS, VIDEO_BASE64 } from './skin-assets.ts'
 
 const SKIN_ID = 'whale-fantasy'
 const LAYER_ATTR = 'data-dsh-skin-layer'
@@ -23,46 +23,45 @@ const STYLE_ATTR = 'data-plugin'
 
 export function apply(ctx: Context): void {
   ctx.effect(() => {
-    const doc = document
     const disposers: Array<() => void> = []
     const onDispose = (fn: () => void): void => {
       disposers.push(fn)
     }
 
-    // 1-2. 样式表。所有资产（CSS 与视频）均构建期内联，相对 url() 解析与
+    // 1-2. 样式表。所有资产（CSS 与视频）均内联于 skin-assets.ts，相对 url() 解析与
     // 网络访问都不是问题。
-    const skinStyle = doc.createElement('style')
+    const skinStyle = document.createElement('style')
     skinStyle.setAttribute(STYLE_ATTR, 'dsh-skin-whale-fantasy/skin')
     skinStyle.textContent = SKIN_CSS
-    doc.head.appendChild(skinStyle)
+    document.head.appendChild(skinStyle)
     onDispose(() => skinStyle.remove())
 
-    const patchStyle = doc.createElement('style')
+    const patchStyle = document.createElement('style')
     patchStyle.setAttribute(STYLE_ATTR, 'dsh-skin-whale-fantasy/patches')
     patchStyle.textContent = PATCHES_CSS
-    doc.head.appendChild(patchStyle)
+    document.head.appendChild(patchStyle)
     onDispose(() => patchStyle.remove())
 
     // 3. 原子盖章。
-    doc.documentElement.setAttribute('data-dsh-skin', SKIN_ID)
-    onDispose(() => doc.documentElement.removeAttribute('data-dsh-skin'))
+    document.documentElement.setAttribute('data-dsh-skin', SKIN_ID)
+    onDispose(() => document.documentElement.removeAttribute('data-dsh-skin'))
 
     // 4. 背景媒体层（与皮肤中心的装饰层一致：负 z 位于 html/body 背景之上、
     // 所有面板之下）。
-    const layer = doc.createElement('div')
+    const layer = document.createElement('div')
     layer.setAttribute(LAYER_ATTR, 'background')
     layer.setAttribute('aria-hidden', 'true')
     layer.style.cssText =
       'position:fixed;top:0;right:0;bottom:0;left:0;z-index:-2;pointer-events:none;will-change:transform;'
 
-    const video = doc.createElement('video')
+    const video = document.createElement('video')
     video.autoplay = true
     video.muted = true
     video.loop = true
     video.playsInline = true
     video.setAttribute('disablepictureinpicture', '')
     video.style.cssText = 'width:100%;height:100%;object-fit:cover;'
-    // 眨眼循环在构建期以 base64 内联；运行时转成 blob URL 交给元素，
+    // 眨眼循环以 base64 内联；运行时转成 blob URL 交给元素，
     // 不发起任何网络请求。
     const videoBytes = Uint8Array.from(atob(VIDEO_BASE64), (c) => c.charCodeAt(0))
     const videoUrl = URL.createObjectURL(new Blob([videoBytes], { type: 'video/mp4' }))
@@ -70,18 +69,18 @@ export function apply(ctx: Context): void {
     onDispose(() => URL.revokeObjectURL(videoUrl))
     layer.appendChild(video)
 
-    const scrim = doc.createElement('div')
+    const scrim = document.createElement('div')
     scrim.style.cssText = `position:absolute;top:0;right:0;bottom:0;left:0;background:${SCRIM};`
     layer.appendChild(scrim)
 
-    doc.body.appendChild(layer)
+    document.body.appendChild(layer)
     onDispose(() => {
       video.pause()
       layer.remove()
     })
 
     // 外壳自己的不透明 body 背景会盖住负 z 层。
-    const bodyStyle = doc.body.style
+    const bodyStyle = document.body.style
     const previousColor = bodyStyle.getPropertyValue('background-color')
     const previousImage = bodyStyle.getPropertyValue('background-image')
     bodyStyle.setProperty('background-color', 'transparent')

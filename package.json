@@ -24,8 +24,7 @@
     }
   },
   "scripts": {
-    "fetch-skin": "node scripts/fetch-skin.mjs",
-    "build": "node scripts/fetch-skin.mjs && tsdown",
+    "build": "tsdown",
     "watch": "tsdown --watch",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

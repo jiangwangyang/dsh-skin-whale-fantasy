@@ -143,11 +143,8 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
 
-.idea/
-.vscode/
-
 # build output
 lib
 
-# generated skin assets (re-run `pnpm fetch-skin`)
-src/client/generated
+.idea/
+.vscode/

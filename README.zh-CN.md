@@ -47,9 +47,7 @@ dsh plugin --profile web add github:jiangwangyang/dsh-skin-whale-fantasy
 |------------|------|------|
 | Host 半边  | `src/index.ts` | 空实现（`apply()` 什么也不做） |
 | 客户端     | `src/client/index.ts` | 注入样式表、盖 `data-dsh-skin` 章、挂载背景层，全部在单个 `ctx.effect` 内 |
-| 皮肤资产   | `src/client/generated/skin-assets.ts`（生成文件） | `SKIN_CSS` / `PATCHES_CSS` / `VIDEO_BASE64` / `SCRIM`，构建期烘焙 |
-| 资产抓取器 | `scripts/fetch-skin.mjs` | 从上游市场仓库下载 `skin.css` / `patches.css` / `LICENSE` 并重新生成资产模块 |
-| 背景视频   | `assets/whale-blink-loop.mp4` | 上游 25.5 秒循环裁剪出的无缝 2.58 秒眨眼片段 |
+| 皮肤资产   | `src/client/skin-assets.ts` | `SKIN_CSS` / `PATCHES_CSS` / `VIDEO_BASE64` / `SCRIM`，全部内联、随仓库分发；视频为上游 25.5 秒循环裁剪出的无缝 2.58 秒眨眼片段 |
 
 ### 激活步骤
 
@@ -64,11 +62,11 @@ dsh plugin --profile web add github:jiangwangyang/dsh-skin-whale-fantasy
 
 - 皮肤全部视觉以 `html` 元素上的 `data-dsh-skin` 属性与注入的 `<style>` 标签为门：插件激活时存在，禁用即消失，无残留
 - 一切注册在单个 `ctx.effect` 内；卸载时 disposer 按注册逆序执行：移除样式表、移除盖章、暂停视频并回收 blob URL、移除背景层、恢复 body 背景
-- 所有资产（CSS 与视频）构建期内联，相对 `url()` 解析与网络访问都不是问题；代价是 client bundle 体积较大
+- 所有资产（CSS 与视频）均随客户端 bundle 分发，相对 `url()` 解析与网络访问都不是问题；代价是 client bundle 体积较大
 
 ### 背景视频
 
-`assets/whale-blink-loop.mp4` 为上游 25.5 秒循环裁剪出的 2.58 秒眨眼片段（第 378-439 帧，15.71 秒–18.29 秒；删除开头线条构建段，剩余眨眼首尾同相位可无缝循环）。复现命令：
+源视频位于 `assets/whale-blink-loop.mp4`（base64 内联进 `src/client/skin-assets.ts`），为上游 25.5 秒循环裁剪出的 2.58 秒眨眼片段（第 378-439 帧，15.71 秒–18.29 秒；删除开头线条构建段，剩余眨眼首尾同相位可无缝循环）。复现命令：
 
 ```bash
 ffmpeg -ss 15.7083 -i whale-fantasy-loop.mp4 -frames:v 62 \
@@ -82,8 +80,7 @@ ffmpeg -ss 15.7083 -i whale-fantasy-loop.mp4 -frames:v 62 \
 
 ```bash
 pnpm install
-pnpm build        # 下载皮肤资产，然后打出 lib/index.js + lib/client.js
-pnpm fetch-skin   # 重新下载 skin.css / patches.css，重新生成资产模块与 LICENSE
+pnpm build        # 打出 lib/index.js + lib/client.js（资产已随仓库分发，无下载步骤）
 ```
 
 ## 项目结构
@@ -92,16 +89,14 @@ pnpm fetch-skin   # 重新下载 skin.css / patches.css，重新生成资产模�
 .
 ├── cordis.patch.yml      # bundle 补丁：把插件行插入 web 插件名册
 ├── package.json          # exports、dsh.bundle / dsh.client 清单
+├── lib                   # 构建产物（已 gitignore）
 ├── assets
-│   └── whale-blink-loop.mp4   # 裁剪后的背景视频（构建期内联）
-├── scripts
-│   └── fetch-skin.mjs    # 构建期皮肤资产抓取器
+│   └── whale-blink-loop.mp4   # 裁剪后的背景视频；skin-assets.ts 中 base64 的来源
 └── src
     ├── index.ts          # Host 半边（空实现）
     └── client
         ├── index.ts      # 客户端（样式 + 盖章 + 背景层）
-        └── generated
-            └── skin-assets.ts   # 生成文件，勿手改——重跑 `pnpm fetch-skin`
+        └── skin-assets.ts   # 皮肤资产（CSS + 视频，全部内联）
 ```
 
 ## 署名

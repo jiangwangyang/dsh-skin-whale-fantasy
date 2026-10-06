@@ -1,5 +1,5 @@
 # dsh-skin-whale-fantasy bundle patch: 鲸鱼娘·未至之境皮肤。纯浏览器侧呈现，
-# 无 Host 侧服务依赖；样式表与背景视频构建期内联，运行时零网络请求。
+# 无 Host 侧服务依赖；样式表与背景视频全部内联，运行时零网络请求。
 - insert:
     - id: ui-skin-whale-fantasy
       name: 'dsh-skin-whale-fantasy'
