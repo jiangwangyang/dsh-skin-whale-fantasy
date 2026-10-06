@@ -2,11 +2,13 @@
   "name": "dsh-skin-whale-fantasy",
   "description": "Whale Girl · The Unreached (鲸鱼娘 · 未至之境) skin as a standalone dsh plugin — enable to apply the skin, disable to restore the stock look. No skin center required.",
   "version": "1.0.0",
+  "private": true,
   "type": "module",
   "main": "lib/index.js",
   "exports": {
     ".": "./lib/index.js",
     "./client": "./lib/client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
     "./package.json": "./package.json"
   },
   "dsh": {
@@ -40,7 +42,7 @@
     "lib",
     "cordis.patch.yml",
     "README.md",
-    "README.zh.md",
+    "README.zh-CN.md",
     "LICENSE"
   ]
 }
