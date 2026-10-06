@@ -1,15 +1,15 @@
 /**
- * tsdown build for the standalone whale-fantasy skin plugin.
+ * 独立鲸鱼娘皮肤插件的 tsdown 构建配置。
  *
- * Two artifacts land in lib/:
- *  - index.js  (node host half, ESM; cordis stays external — the host resolves
- *    it from the dsh profile tree)
- *  - client.js (browser half, CJS closure-factory: the bundle hands itself to
- *    window.__ModuleLoader__.load({ id, factory }) exactly like the official
- *    client-module loader expects)
+ * lib/ 下产出两个产物：
+ *  - index.js  （Node 宿主半边，ESM；cordis 保持外部依赖——宿主会从
+ *    dsh 配置树中解析它）
+ *  - client.js （浏览器半边，CJS 闭包工厂：bundle 把自己交给
+ *    window.__ModuleLoader__.load({ id, factory })，与官方客户端模块
+ *    加载器期望的形态完全一致）
  *
- * The browser half imports nothing at runtime (type-only cordis imports are
- * erased), so no module-table externals are needed.
+ * 浏览器半边运行时不 import 任何东西（cordis 仅为类型导入，编译即擦除），
+ * 因此无需配置模块表外部依赖。
  */
 import type { UserConfig } from 'tsdown'
 

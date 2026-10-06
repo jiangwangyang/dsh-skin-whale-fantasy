@@ -1,21 +1,18 @@
 /**
- * Browser half of the standalone whale-fantasy skin plugin.
+ * 独立鲸鱼娘皮肤插件的浏览器半边。
  *
- * Applies the skin the same way the skin center does, minus every management
- * concern — enable the plugin and the skin is on, disable it and the stock
- * look returns. One activation, no switching, no settings:
+ * 应用方式与皮肤中心完全一致，只是剥掉了一切管理职能——启用插件皮肤
+ * 即生效，禁用即恢复默认外观。一次激活、无切换、无设置：
  *
- *   1. skin.css (L1 token remap, 95 --dsw-alias-* tokens) as a <style> tag;
- *   2. patches.css (L3 atmosphere layer) as a <style> tag;
- *   3. html[data-dsh-skin="whale-fantasy"] — the skin-center contract stamp,
- *      kept so patches written against it (and other plugins keying on it)
- *      behave identically;
- *   4. a fixed background layer (z-index:-2, pointer-events:none) carrying
- *      the looping blink video plus its scrim, with body backgrounds forced
- *      transparent so the art shows through.
+ *   1. skin.css（L1 token 重映射，96 个 --dsw-alias-*）以 <style> 标签注入；
+ *   2. patches.css（L3 氛围层）以 <style> 标签注入；
+ *   3. html[data-dsh-skin="whale-fantasy"]——皮肤中心契约盖章，保留它
+ *      可让针对该标记编写的补丁（以及依赖该标记的其他插件）行为完全一致；
+ *   4. 固定背景层（z-index:-2，pointer-events:none），承载循环眨眼视频
+ *      及其 scrim 渐变，并把 body 背景强制透明让画面透出。
  *
- * Everything lives inside one ctx.effect, so unloading the plugin tears the
- * skin down completely (disposers run in reverse registration order).
+ * 一切挂在单个 ctx.effect 内，卸载插件时皮肤被完整拆除（disposer 按注册
+ * 逆序执行）。
  */
 import type { Context } from '@deepseek-ai/cordis'
 import { PATCHES_CSS, SCRIM, SKIN_CSS, VIDEO_BASE64 } from './generated/skin-assets.ts'
@@ -32,8 +29,8 @@ export function apply(ctx: Context): void {
       disposers.push(fn)
     }
 
-    // 1-2. Stylesheets. Every asset (CSS and the video) is inlined at build
-    // time, so relative url() resolution and network access are not concerns.
+    // 1-2. 样式表。所有资产（CSS 与视频）均构建期内联，相对 url() 解析与
+    // 网络访问都不是问题。
     const skinStyle = doc.createElement('style')
     skinStyle.setAttribute(STYLE_ATTR, 'dsh-skin-whale-fantasy/skin')
     skinStyle.textContent = SKIN_CSS
@@ -46,12 +43,12 @@ export function apply(ctx: Context): void {
     doc.head.appendChild(patchStyle)
     onDispose(() => patchStyle.remove())
 
-    // 3. The atomic stamp.
+    // 3. 原子盖章。
     doc.documentElement.setAttribute('data-dsh-skin', SKIN_ID)
     onDispose(() => doc.documentElement.removeAttribute('data-dsh-skin'))
 
-    // 4. Background media layer (mirrors the skin center's decoration layer:
-    // negative z paints above html/body backgrounds yet below every panel).
+    // 4. 背景媒体层（与皮肤中心的装饰层一致：负 z 位于 html/body 背景之上、
+    // 所有面板之下）。
     const layer = doc.createElement('div')
     layer.setAttribute(LAYER_ATTR, 'background')
     layer.setAttribute('aria-hidden', 'true')
@@ -65,8 +62,8 @@ export function apply(ctx: Context): void {
     video.playsInline = true
     video.setAttribute('disablepictureinpicture', '')
     video.style.cssText = 'width:100%;height:100%;object-fit:cover;'
-    // The blink loop is inlined as base64 at build time; hand it to the
-    // element as a blob URL so no network fetch ever happens.
+    // 眨眼循环在构建期以 base64 内联；运行时转成 blob URL 交给元素，
+    // 不发起任何网络请求。
     const videoBytes = Uint8Array.from(atob(VIDEO_BASE64), (c) => c.charCodeAt(0))
     const videoUrl = URL.createObjectURL(new Blob([videoBytes], { type: 'video/mp4' }))
     video.src = videoUrl
@@ -83,7 +80,7 @@ export function apply(ctx: Context): void {
       layer.remove()
     })
 
-    // The shell's own opaque body background would cover the negative-z layer.
+    // 外壳自己的不透明 body 背景会盖住负 z 层。
     const bodyStyle = doc.body.style
     const previousColor = bodyStyle.getPropertyValue('background-color')
     const previousImage = bodyStyle.getPropertyValue('background-image')
