@@ -9,13 +9,17 @@
  *   3. html[data-dsh-skin="whale-fantasy"]——皮肤中心契约盖章，保留它
  *      可让针对该标记编写的补丁（以及依赖该标记的其他插件）行为完全一致；
  *   4. 固定背景层（z-index:-2，pointer-events:none），承载循环眨眼视频
- *      及其 scrim 渐变，并把 body 背景强制透明让画面透出。
+ *      及其 scrim 渐变；
+ *   5. 背景层内嵌全屏压暗层（位于 video 之后、scrim 之前）：
+ *      0.5 不透明度的深夜蓝黑纱均匀压暗画面，保证透明面板上的
+ *      文字可读性（思路同 dsh-theme-blackhole 的整页黑纱）；
+ *   6. body 背景强制透明，让负 z 层透出（原值被记录，卸载时恢复）。
  *
  * 一切挂在单个 ctx.effect 内，卸载插件时皮肤被完整拆除（disposer 按注册
  * 逆序执行）。
  */
 import type { Context } from '@deepseek-ai/cordis'
-import { PATCHES_CSS, SCRIM, SKIN_CSS, VIDEO_BASE64 } from './skin-assets.ts'
+import { PATCHES_CSS, SCRIM, SKIN_CSS, VEIL, VIDEO_BASE64 } from './skin-assets.ts'
 
 const SKIN_ID = 'whale-fantasy'
 const LAYER_ATTR = 'data-dsh-skin-layer'
@@ -69,6 +73,19 @@ export function apply(ctx: Context): void {
     onDispose(() => URL.revokeObjectURL(videoUrl))
     layer.appendChild(video)
 
+    // 5. 全屏压暗层（VEIL 与 scrim 同为 rgb(5,7,13) 深夜蓝黑色系），
+    // 均匀压暗画面，保证透明面板上的文字可读性。
+    // 必须挂在背景层内部、video 之后：video 播放后会被合成器提升为
+    // 独立合成层，可能越过 z-index 浮到层外平级元素之上（实测症状：
+    // 压暗生效不到 1 秒即失效）；与 video 同处一个层叠上下文时 DOM
+    // 序即绘制序，压暗层稳定压在视频之上。随背景层一并移除，无需
+    // 单独的 disposer。
+    const veil = document.createElement('div')
+    veil.setAttribute('aria-hidden', 'true')
+    veil.style.cssText =
+      `position:absolute;top:0;right:0;bottom:0;left:0;background:${VEIL};`
+    layer.appendChild(veil)
+
     const scrim = document.createElement('div')
     scrim.style.cssText = `position:absolute;top:0;right:0;bottom:0;left:0;background:${SCRIM};`
     layer.appendChild(scrim)
@@ -79,7 +96,7 @@ export function apply(ctx: Context): void {
       layer.remove()
     })
 
-    // 外壳自己的不透明 body 背景会盖住负 z 层。
+    // 6. 外壳自己的不透明 body 背景会盖住负 z 层，强制透明。
     const bodyStyle = document.body.style
     const previousColor = bodyStyle.getPropertyValue('background-color')
     const previousImage = bodyStyle.getPropertyValue('background-image')
